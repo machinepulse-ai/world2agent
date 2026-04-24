@@ -445,6 +445,4 @@ If the summary is unreadable, your Phase 2 work wasn't thorough — go back.
 - Schema (0.1): https://github.com/machinepulse-ai/world2agent/blob/main/schema/0.1/schema.ts
 - SDK: `@world2agent/sdk`
 - Host channels (each one handles install + lifecycle in its own way):
-  - `@world2agent/channel-claude-code` — `/world2agent:sensor-add` slash command
-  - `@world2agent/channel-codex` — implicit sensor-add skill
-  - `@world2agent/plugin-openclaw` — OpenClaw Gateway plugin
+  - `@world2agent/claude-code-channel` — `/world2agent:sensor-add` slash command

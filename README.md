@@ -1,3 +1,5 @@
+![Welcome to World2Agent](./docs/images/readme-banner.png)
+
 **Agents can't act on what they can't perceive.**
 
 World2Agent is an open protocol that connects the world to AI agents. It standardizes how agents perceive their surroundings — stock movements, meeting updates, new research papers, GitHub trending repos, X/Twitter feeds, and anything else that can emit a signal.
@@ -96,58 +98,49 @@ Key design decisions:
 
 * **`attachments`** carry actual content blobs (message bodies, diffs, images, audio). Each item is a tagged union: `{ type: "inline", mime_type, description, data }` for embedded content, or `{ type: "reference", mime_type, description, uri }` for externally-addressable content. `description` is required on both so AI always understands what it's looking at. Not for structured metadata — that belongs in `source_event`.
 
-* **No routing in protocol** — routing/priority is a consumer-side concern, not the sensor's.
+* **No routing in protocol** -- routing/priority is a consumer-side concern, not the sensor's.
 
 ***
 
-## For Signal Consumers
+## Quick Start
 
-Install the SDK and any sensor, get signals in a few lines:
+W2A plugs into any agent that can consume structured signals. Pick the integration that matches your setup, or pipe sensors directly into your own consumer.
+
+Browse the full sensor catalog at [sensorhub.world2agent.ai](https://sensorhub.world2agent.ai).
+
+> **Security — install only sensors you trust.**
+>
+> A sensor's signals drive what your agent perceives and does, so an untrusted sensor is effectively an untrusted instruction source. We strongly recommend installing only open-source sensors from authors you trust, and reviewing the code before running it.
+
+### Claude Code
+
+In an active Claude Code session, install the `world2agent` plugin:
+
+```
+/plugin marketplace add machinepulse-ai/world2agent-plugins
+/plugin install world2agent@world2agent-plugins
+/reload-plugins
+```
+
+Add a sensor — for example, Hacker News:
+
+```
+/world2agent:sensor-add @world2agent/sensor-hacknews
+```
+
+Then restart Claude Code with the plugin channel loaded so sensor signals can be delivered into your session:
 
 ```bash
-npm install @world2agent/sdk @world2agent/sensor-slack
+claude --dangerously-load-development-channels plugin:world2agent@world2agent-plugins
 ```
 
-```typescript
-import { run } from "@world2agent/sdk/sensor";
-import { createSignalHandler } from "@world2agent/sdk/consumer";
-import slack from "@world2agent/sensor-slack";
+### More agent integrations
 
-const handler = createSignalHandler();
+More first-class agent integrations are on the way. Until then, any agent can consume W2A signals directly via the pipe mode below.
 
-handler.on("messaging.message.direct", async (signal) => {
-  console.log("Direct message:", signal.event.summary);
-  // Your agent logic here
-});
+### Pipe mode
 
-handler.on("messaging.message.mentioned", async (signal) => {
-  console.log("Mentioned:", signal.event.summary);
-});
-
-await run(slack, {
-  config: { bot_token: "xoxb-..." },
-  onSignal: (signal) => handler.handle(signal),
-});
-```
-
-**Multi-sensor** -- compose sensors freely, they all speak the same schema:
-
-```typescript
-import { runAll } from "@world2agent/sdk/sensor";
-import { fanout, stdoutTransport, httpTransport } from "@world2agent/sdk/transports";
-
-await runAll([
-  { spec: slack, config: { bot_token: "xoxb-..." } },
-  { spec: gcal, config: { client_id: "xxx", client_secret: "xxx", refresh_token: "xxx" } },
-], {
-  onSignal: fanout([
-    stdoutTransport(),
-    httpTransport({ url: "https://your-app.com/api/signals" }),
-  ]),
-});
-```
-
-**Pipe mode** -- every sensor has a standalone CLI:
+Every sensor ships as a standalone CLI, so you can pipe signals into any consumer — no plugin required:
 
 ```bash
 w2a-sensor-slack | your-consumer-app
@@ -155,49 +148,27 @@ w2a-sensor-slack | your-consumer-app
 
 ***
 
-## For Sensor Developers
+## Build a sensor
 
-Build a new sensor in \~50 lines:
+A sensor is an independent npm package that watches one source and emits `W2ASignal`. Install our skill and ask your coding agent to build it — the skill walks through source interrogation, signal design, scaffold, and install recipe:
 
-```typescript
-import { defineSensor } from "@world2agent/sdk/sensor";
-import { createSignal } from "@world2agent/sdk";
-import { z } from "zod";
-
-export default defineSensor({
-  id: "my-sensor",
-  version: "0.1.0",
-  source_type: "my-source",
-  auth: { type: "api_key", fields: [{ name: "token", label: "API Token", sensitive: true }] },
-  configSchema: z.object({ token: z.string() }),
-
-  async start(ctx) {
-    const interval = setInterval(async () => {
-      const data = await fetchMySource(ctx.config.token);
-
-      const signal = createSignal(this, {
-        event: {
-          type: "my-source.item.created",
-          summary: `${data.author} created "${data.title}" in ${data.project}; priority ${data.priority}, assigned to you`,
-        },
-        source_event: {
-          schema: { type: "object", properties: { id: { type: "string" }, priority: { type: "number" } } },
-          data:   { id: data.id, priority: data.priority },
-        },
-        attachments: [
-          { type: "inline", mime_type: "text/plain", description: "Item description", data: data.body },
-        ],
-      });
-
-      await ctx.emit(signal);
-    }, 60_000);
-
-    return () => clearInterval(interval); // cleanup
-  },
-});
+```bash
+npx skills add https://github.com/machinepulse-ai/world2agent/skills/build-w2a-sensor
 ```
 
+See the [TypeScript SDK](https://github.com/machinepulse-ai/world2agent-typescript-sdk) for the `defineSensor` / `run` / transport APIs.
+
 ***
+
+## Contribute
+
+World2Agent is an open protocol — the real breakthroughs come from the community. Ways to get involved:
+
+* **Publish a sensor** — pick a source you care about and build a sensor for it (see *Build a sensor* above). Once it's on npm, anyone can install it. High-quality sensors get surfaced on [sensorhub.world2agent.ai](https://sensorhub.world2agent.ai).
+* **Evolve the protocol** — propose schema changes via PR against [`schema/`](./schema). Protocol changes land here first, then flow into the SDK and plugins.
+* **Improve the SDK** — the reference TypeScript SDK lives at [`world2agent-typescript-sdk`](https://github.com/machinepulse-ai/world2agent-typescript-sdk). Help with transports, testing utilities, or SDKs in other languages.
+* **Add an agent integration** — bring W2A to another agent runtime via the [plugins repo](https://github.com/machinepulse-ai/world2agent-plugins).
+* **File issues & ideas** — bug reports, ambiguous schema fields, sensor wishlist entries all welcome.
 
 ## License
 
