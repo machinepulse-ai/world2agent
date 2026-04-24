@@ -1,0 +1,12 @@
+{
+  "name": "@world2agent/protocol",
+  "private": true,
+  "version": "0.1.0",
+  "description": "World2Agent protocol — canonical schema (wire format)",
+  "scripts": {
+    "gen:schema": "typescript-json-schema schema/0.1/tsconfig.json '*' --out schema/0.1/schema.json --required --strictNullChecks --topRef --noExtraProps=false"
+  },
+  "devDependencies": {
+    "typescript-json-schema": "^0.65.1"
+  }
+}

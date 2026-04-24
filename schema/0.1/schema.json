@@ -1,0 +1,228 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "definitions": {
+        "Attachment": {
+            "anyOf": [
+                {
+                    "$ref": "#/definitions/InlineAttachment"
+                },
+                {
+                    "$ref": "#/definitions/ReferenceAttachment"
+                }
+            ],
+            "description": "A single content attachment. Tagged union on {@link Attachment.type}:\ncontent is either inlined as a string ({@link InlineAttachment}) or\nreferenced by URI ({@link ReferenceAttachment})."
+        },
+        "InlineAttachment": {
+            "description": "Inline attachment. For text mime types `data` is UTF-8; for binary\ntypes `data` is base64-encoded.",
+            "properties": {
+                "_meta": {
+                    "$ref": "#/definitions/Record<string,unknown>",
+                    "description": "Extension point. See {@link W2ASignal._meta}."
+                },
+                "data": {
+                    "description": "Inline content. UTF-8 for text mime types, base64 for binary.",
+                    "type": "string"
+                },
+                "description": {
+                    "description": "One-line human/AI description of what the attachment is, e.g.\n`\"Original message body\"`, `\"Error-rate dashboard screenshot\"`.",
+                    "minLength": 1,
+                    "type": "string"
+                },
+                "mime_type": {
+                    "description": "RFC 6838 media type, e.g. `\"text/plain\"`, `\"image/png\"`. OPEN set.",
+                    "type": "string"
+                },
+                "type": {
+                    "const": "inline",
+                    "description": "Discriminator.",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "data",
+                "description",
+                "mime_type",
+                "type"
+            ],
+            "type": "object"
+        },
+        "ProtocolVersion": {
+            "const": "w2a/0.1",
+            "type": "string"
+        },
+        "Record<string,unknown>": {
+            "type": "object"
+        },
+        "ReferenceAttachment": {
+            "description": "External reference attachment. Sensors SHOULD prefer `reference` for\nanything larger than a few KiB, or anything already addressable.",
+            "properties": {
+                "_meta": {
+                    "$ref": "#/definitions/Record<string,unknown>",
+                    "description": "Extension point. See {@link W2ASignal._meta}."
+                },
+                "description": {
+                    "description": "One-line human/AI description of what the attachment is.",
+                    "minLength": 1,
+                    "type": "string"
+                },
+                "mime_type": {
+                    "description": "RFC 6838 media type, e.g. `\"image/png\"`. OPEN set.",
+                    "type": "string"
+                },
+                "type": {
+                    "const": "reference",
+                    "description": "Discriminator.",
+                    "type": "string"
+                },
+                "uri": {
+                    "description": "External reference (HTTPS URL, `file://`, or a content-addressed\nscheme). Consumers fetch on demand.",
+                    "format": "uri",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "description",
+                "mime_type",
+                "type",
+                "uri"
+            ],
+            "type": "object"
+        },
+        "SignalEvent": {
+            "description": "Describes the real-world event that triggered the signal.",
+            "properties": {
+                "_meta": {
+                    "$ref": "#/definitions/Record<string,unknown>",
+                    "description": "Extension point. See {@link W2ASignal._meta}."
+                },
+                "occurred_at": {
+                    "description": "When the event actually happened on the source platform, UTC\nmilliseconds. If the source does not expose this, sensors SHOULD\nfall back to {@link W2ASignal.emitted_at}.",
+                    "minimum": 0,
+                    "type": "integer"
+                },
+                "summary": {
+                    "description": "Natural-language summary — the soul of the signal. An AI reading\nonly this line must be able to decide whether and how to act.\n\nRecommended pattern (Actor–Action–Object–Context–Impact):\n\n    [Actor] [Action] [Object] in [Context]; [Impact]\n\nA vague summary has no value.",
+                    "minLength": 20,
+                    "type": "string"
+                },
+                "type": {
+                    "description": "Event classification using `domain.entity.action` naming, e.g.\n`\"messaging.message.mentioned\"`, `\"repo.issue.opened\"`,\n`\"market.quote.threshold_crossed\"`.\n\n- `domain` groups the source space (`messaging`, `repo`, `market`).\n- `entity` is the object the event is about (`message`, `issue`).\n- `action` is the verb in past tense (`mentioned`, `opened`).\n\nOPEN namespace — sensors define their own `domain.entity.action`\ntriples. Consumers pattern-match on this string, so the triples a\nsensor emits are part of that sensor's public contract.",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "occurred_at",
+                "summary",
+                "type"
+            ],
+            "type": "object"
+        },
+        "SignalSource": {
+            "description": "Identifies the emitter of a signal.",
+            "properties": {
+                "package": {
+                    "description": "Package coordinate of the sensor — the canonical identifier channels\nand bridges use to derive the agent-side handler id (e.g. a skill\nname). Typically equal to {@link SignalSource.sensor_id}.",
+                    "type": "string"
+                },
+                "sensor_id": {
+                    "description": "Stable sensor identifier. By convention this is the npm package name\n(e.g. `\"@world2agent/sensor-github\"`); for other registries it is the\ncanonical package coordinate for that registry.",
+                    "type": "string"
+                },
+                "sensor_version": {
+                    "description": "Sensor semantic version, e.g. `\"0.1.0\"`.",
+                    "type": "string"
+                },
+                "source_type": {
+                    "description": "Logical source identifier shared across sensors of the same platform,\ne.g. `\"github\"`, `\"cron\"`, `\"feishu\"`. Agents and graph layers use\nthis for coarse grouping independent of which package emitted.\n\nOPEN set — new platforms coin their own lowercase single-word\nidentifier; no central registry.",
+                    "type": "string"
+                },
+                "user_identity": {
+                    "description": "Identity of the end user on the source platform (open id, handle,\naccount id). Enables per-user routing and multi-tenant isolation.",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "package",
+                "sensor_id",
+                "sensor_version",
+                "source_type",
+                "user_identity"
+            ],
+            "type": "object"
+        },
+        "SourceEvent": {
+            "description": "Self-describing original event data from the source platform. Carries\nmachine-readable IDs, numbers, booleans, and other facts the graph\nlayer or agent may want to reason over or audit.",
+            "properties": {
+                "_meta": {
+                    "$ref": "#/definitions/Record<string,unknown>",
+                    "description": "Extension point. See {@link W2ASignal._meta}."
+                },
+                "data": {
+                    "$ref": "#/definitions/Record<string,unknown>",
+                    "description": "The actual structured data conforming to {@link SourceEvent.schema}."
+                },
+                "schema": {
+                    "$ref": "#/definitions/Record<string,unknown>",
+                    "description": "JSON Schema draft-07 object describing the shape of\n{@link SourceEvent.data}. Represented as an opaque record here;\nconsumers MAY validate that it parses as a JSON Schema."
+                }
+            },
+            "required": [
+                "data",
+                "schema"
+            ],
+            "type": "object"
+        },
+        "W2ASignal": {
+            "description": "The unified signal envelope. Every sensor emits `W2ASignal` and every\nconsumer accepts `W2ASignal` — no sensor-specific shapes on the wire.\n\nAn agent reading only {@link SignalEvent.summary} must be able to\ndecide whether and how to act. Everything else is for downstream\nenrichment or audit.",
+            "properties": {
+                "_meta": {
+                    "$ref": "#/definitions/Record<string,unknown>",
+                    "description": "Extension point for implementation-specific or experimental fields\n(tracing ids, audit markers, vendor annotations). Consumers MUST\nignore unknown `_meta` keys."
+                },
+                "attachments": {
+                    "description": "Content attachments relevant to the signal.",
+                    "items": {
+                        "$ref": "#/definitions/Attachment"
+                    },
+                    "type": "array"
+                },
+                "emitted_at": {
+                    "description": "When the signal was emitted by the sensor, UTC milliseconds since the\nUnix epoch. Distinct from {@link SignalEvent.occurred_at}, which is\nwhen the underlying real-world event happened.",
+                    "minimum": 0,
+                    "type": "integer"
+                },
+                "event": {
+                    "$ref": "#/definitions/SignalEvent",
+                    "description": "Describes what happened."
+                },
+                "schema_version": {
+                    "const": "w2a/0.1",
+                    "description": "Protocol version — pinned to {@link PROTOCOL_VERSION}.",
+                    "type": "string"
+                },
+                "signal_id": {
+                    "description": "Unique identifier for deduplication and tracing.\n\nSensors MUST generate a fresh id per emission, even for logically\nidentical events; consumers use this to idempotently process retries.",
+                    "format": "uuid",
+                    "type": "string"
+                },
+                "source": {
+                    "$ref": "#/definitions/SignalSource",
+                    "description": "Identifies who emitted the signal and where it originated."
+                },
+                "source_event": {
+                    "$ref": "#/definitions/SourceEvent",
+                    "description": "Self-describing original event data from the source platform.\nDistinct from {@link W2ASignal.event}, which is the normalized\ncross-source event summary and routing key."
+                }
+            },
+            "required": [
+                "emitted_at",
+                "event",
+                "schema_version",
+                "signal_id",
+                "source"
+            ],
+            "type": "object"
+        }
+    }
+}
+
