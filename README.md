@@ -10,22 +10,18 @@
 </p>
 
 <p align="center">
-  <a href="https://machinepulse.ai">Website</a> ·
+  <a href="https://world2agent.ai">Website</a> ·
   <a href="#quick-start">Quick Start</a> ·
   <a href="#sensors">Sensors</a> ·
-  <a href="#sensorhub">SensorHub</a> ·
+  <a href="https://world2agent.ai/hub">SensorHub</a> ·
   <a href="./docs">Docs</a> ·
   <a href="#community">Community</a>
 </p>
 
 <!-- Concept Video -->
 <p align="center">
-  <a href="[YOUTUBE_VIDEO_LINK]">
-    <img src="./assets/video-thumbnail.png" alt="Watch the W2A Concept Video" width="720" />
-  </a>
-</p>
-<p align="center">
-  ▶️ <a href="[YOUTUBE_VIDEO_LINK]"><strong>Watch: What is World2Agent?</strong></a>
+  <a href="https://world2agent.ai/assets/promo-w2a.mp4">
+    Watch the W2A Concept Video
 </p>
 
 <p align="center">

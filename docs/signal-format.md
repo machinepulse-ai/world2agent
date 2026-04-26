@@ -111,9 +111,11 @@ Examples:
 | `market.quote.threshold_crossed` | market | quote | threshold_crossed |
 | `calendar.event.updated` | calendar | event | updated |
 
+`action` must be a **past-tense verb** (`opened`, `mentioned`, `threshold_crossed`), never a base form or gerund (`open` ❌, `opening` ❌). Signals describe things that already happened, and consumers read the triple as a sentence — past tense is what makes it a sentence.
+
 Open namespace — sensors coin their own triples. Consumers pattern-match on this string, so the triples a sensor emits are part of its public contract; treat them as you would a public API.
 
-`domain` is the **abstract source space** (`messaging`, `repo`, `market`, `calendar`), not the platform name. The platform identity already lives in `source.source_type` — keeping the two orthogonal is what lets one handler match the same semantic event across platforms: `handler.on("messaging.message.mentioned")` catches Slack, Discord, Lark, and Teams alike. A sensor for GitHub stars emits `repo.repo.starred` (with `source.source_type: "github"`), not `github.repo.starred`.
+`domain` is the **abstract source space** (`messaging`, `repo`, `market`, `calendar`), not the platform name. The platform identity already lives in `source.source_type` — keeping the two orthogonal is what lets one handler match the same semantic event across platforms: `handler.on("messaging.message.mentioned")` catches Slack, Discord, Lark, and Teams alike. A sensor for GitHub stars emits `repo.star.added` (with `source.source_type: "github"`), not `github.repo.starred`.
 
 `event.occurred_at` is when the underlying event happened. If the source doesn't expose it, fall back to `emitted_at`.
 

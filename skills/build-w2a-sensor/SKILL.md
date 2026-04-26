@@ -46,7 +46,7 @@ Pick the highest available option — **do not default to polling if a push chan
 
 List every triple it will emit as `domain.entity.action` (open namespace — you coin them). Examples: `messaging.message.received`, `repo.issue.created`, `market.quote.threshold_crossed`. These strings are your sensor's public contract — consumers pattern-match against them, so stability matters.
 
-`domain` is the **abstract source space** (`messaging`, `repo`, `market`, `calendar`), **not the platform name**. The platform identity already lives in `source.source_type` (`"slack"`, `"github"`, `"jira"`). A Slack sensor emits `messaging.message.mentioned`, not `slack.message.mentioned` — that's what lets a consumer write `handler.on("messaging.message.mentioned")` once and match @-events from Slack, Discord, Lark, and Teams alike. `action` is a verb in past tense (`mentioned`, `opened`, `received`), not a gerund (`trending` ❌ → `trending_entered` ✅).
+`domain` is the **abstract source space** (`messaging`, `repo`, `market`, `calendar`), **not the platform name**. The platform identity already lives in `source.source_type` (`"slack"`, `"github"`, `"jira"`). A Slack sensor emits `messaging.message.mentioned`, not `slack.message.mentioned` — that's what lets a consumer write `handler.on("messaging.message.mentioned")` once and match @-events from Slack, Discord, Lark, and Teams alike. `action` is a verb in past tense (`mentioned`, `opened`, `received`, `entered`), not a base form or gerund (`mention` ❌, `opening` ❌).
 
 ### 4. What config does the sensor need?
 

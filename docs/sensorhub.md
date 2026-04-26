@@ -15,7 +15,7 @@ npm search w2a-sensor
 Install any sensor by package name:
 
 ```bash
-npm install {PackageName}
+npm install <package-name>
 ```
 
 ## Publish a Sensor
@@ -26,7 +26,7 @@ Build your sensor with the [W2A SDK](./build-a-sensor.md), then ship it to npm:
 npm publish
 ```
 
-That's the distribution. SensorHub indexes published sensors and surfaces them on the website — no separate publish step today.
+`npm publish` handles distribution. To get listed on SensorHub, submit your sensor at [world2agent.ai/hub/submit](https://world2agent.ai/hub/submit) — this is a one-time manual step per package; SensorHub does not auto-crawl npm today.
 
 Requirements:
 - An npm account (this is the quality gate — npm identity = accountability)

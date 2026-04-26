@@ -56,7 +56,7 @@ handler.on("repo.trending.entered", async (signal) => {
   // Your agent logic here
 });
 
-handler.on("repo.repo.starred", async (signal) => {
+handler.on("repo.star.added", async (signal) => {
   console.log("New star:", signal.event.summary);
 });
 
