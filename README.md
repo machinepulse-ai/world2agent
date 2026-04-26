@@ -1,120 +1,59 @@
 ![Welcome to World2Agent](./docs/images/readme-banner.png)
 
-**Agents can't act on what they can't perceive.**
+<p align="center">
+  <strong>Agents can't act on what they can't perceive.</strong>
+</p>
 
-World2Agent is an open protocol that connects the world to AI agents. It standardizes how agents perceive their surroundings — stock movements, meeting updates, new research papers, GitHub trending repos, X/Twitter feeds, and anything else that can emit a signal.
+<p align="center">
+  <a href="./LICENSE"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License" /></a>
+  <a href="https://www.npmjs.com/org/world2agent"><img src="https://img.shields.io/badge/npm-%40world2agent-red" alt="npm" /></a>
+</p>
 
-## Why World2Agent?
+<p align="center">
+  <a href="https://world2agent.ai">Website</a> ·
+  <a href="#quick-start">Quick Start</a> ·
+  <a href="#sensors">Sensors</a> ·
+  <a href="https://world2agent.ai/hub">SensorHub</a> ·
+  <a href="./docs">Docs</a> ·
+  <a href="#community">Community</a>
+</p>
 
-AI agents today are mostly reactive — they wait for user input, or have to actively search for information. A truly useful agent needs to proactively perceive its environment: a stock price hitting your threshold, a meeting agenda changing 10 minutes before it starts, a new paper dropping in your research area, a repo trending on GitHub that's relevant to your project.
+<!-- Concept Video -->
+<p align="center">
+  <a href="https://world2agent.ai/assets/promo-w2a.mp4">
+    Watch the W2A Concept Video
+</p>
 
-Without a standard, every agent builder has to:
+<p align="center">
+  <img src="https://img.shields.io/github/stars/machinepulse-ai/world2agent?style=social" alt="GitHub Stars" />
+</p>
+<p align="center">
+  Like what you see? Give us a ⭐ — every star helps more developers discover W2A.
+</p>
 
-* Write bespoke integrations for each data source
+***
 
-* Design their own signal schema — none of which are interoperable
+## What is World2Agent?
 
-* Handle polling, webhooks, auth, dedup, backpressure from scratch
+World2Agent (W2A) is an open protocol that standardizes how AI agents perceive the real world. Install a sensor, your agent gets structured, real-time data. Swap sensors freely — they all speak the same schema.
 
-World2Agent makes perception pluggable. Install a sensor, get structured signals. Swap one sensor for another, your agent code doesn't change. Compose multiple sensors, they all speak the same schema. Standardized, open, and pluggable — for perception.
+W2A isn't a product. It's an open protocol and an invitation. We built the first sensors — the real breakthroughs will come from the community.
 
-* **Unified signal format** — one schema for all sources, designed for AI consumption
-
-* **Pluggable sensors** — each sensor is an independent npm package; install only what you need
-
-* **Pluggable delivery** — direct to agent, or enriched via a graph layer (self-hosted or third-party)
-
-* **Pluggable transports** — stdout pipe, HTTP POST, or any custom transport
-
-* **Zero lock-in** — run sensors yourself, compose them freely, no central server
-
-We built the protocol and the first sensors. But these are just the starting point — the real breakthroughs will come from the community.
+→ [Why W2A? Full story](./docs/why-w2a.md)
 
 ## Architecture
 
 **World → Sensor → Agent**
 
-Sensors watch data sources and emit structured signals following W2A Protocol — a unified signal schema designed for AI consumption. Your agent receives signals and decides what to do.
-
-The protocol defines what a signal looks like. Sensors do the work. Agents make the decisions.
-
-This is the core loop — and it's all you need to get started.
-
-## Roadmap
-
-As your needs grow, W2A supports more advanced patterns:
-
-* **Graph layer** — compose and enrich signals from multiple sensors before they reach your agent. Run it yourself, or use a hosted service. Graph input and output both follow W2A Protocol, so it slots in without changing your agent code.
-
-* **SensorHub** — an open registry where anyone can publish, discover, and install sensors from the community. Think npm, but for real-world perception.
-
-These are on the roadmap. The protocol and the first sensors are ready today.
+Sensors watch data sources and emit structured data following W2A Protocol. Your agent receives signals and decides what to do.
 
 ![World2Agent system architecture](./docs/images/system-architecture.png)
 
-## Packages
-
-> [**SDK Reference →**](https://github.com/machinepulse-ai/world2agent-typescript-sdk) Full API documentation for sensor developers and signal consumers.
-
-***
-
-## Signal Format
-
-Every signal follows a unified schema:
-
-```typescript
-{
-  signal_id: "uuid-v4",
-  schema_version: "w2a/0.1",
-  emitted_at: 1719000000000,
-  source: {
-    sensor_id: "<package-name>",
-    sensor_version: "0.1.0",
-    source_type: "slack",
-    user_identity: "U01A2B3C4D",            // Slack id of the user this sensor serves
-    package: "<package-name>",              // canonical package coordinate; usually = sensor_id
-  },
-  event: {                                  // normalized cross-source classification
-    type: "messaging.message.mentioned",    // domain.entity.action
-    occurred_at: 1719000000000,
-    summary: "Zhang Wei asked about payment deployment safety in #engineering; staging error rate spiked 2h ago, blocking release pipeline",
-  },
-  source_event: {                           // optional, self-describing original payload from the source
-    schema: { /* JSON Schema draft-07 describing `data` */ },
-    data:   { channel_id: "C01ENG0001", message_ts: "1719000000.001200", user_id: "U09Z8Y7X6W" },
-  },
-  attachments: [                            // optional, content blobs (tagged union on `type`)
-    { type: "inline",    mime_type: "text/plain", description: "Original message text", data: "..." },
-    { type: "reference", mime_type: "image/png",  description: "Error rate dashboard screenshot", uri: "https://..." },
-  ],
-}
-```
-
-Key design decisions:
-
-* **`event.summary`** is the soul of the signal. An AI reading only the summary must be able to decide whether and how to act. Follow Actor-Action-Object-Context-Impact: *who did what, where, and why it matters*.
-
-* **`event` vs `source_event`** — `event` is the normalized cross-source classification (`type` / `occurred_at` / `summary`). `source_event` is the self-describing original payload from the source platform (`schema` + `data`, both required when present). Keeping them separate lets agents pattern-match on `event.type` without knowing platform-specific shapes, while graph layers still get the full structured facts.
-
-* **`attachments`** carry actual content blobs (message bodies, diffs, images, audio). Each item is a tagged union: `{ type: "inline", mime_type, description, data }` for embedded content, or `{ type: "reference", mime_type, description, uri }` for externally-addressable content. `description` is required on both so AI always understands what it's looking at. Not for structured metadata — that belongs in `source_event`.
-
-* **No routing in protocol** -- routing/priority is a consumer-side concern, not the sensor's.
-
-***
+→ [Signal format spec](./docs/signal-format.md) · [Architecture deep dive](./docs/architecture.md)
 
 ## Quick Start
 
-W2A plugs into any agent that can consume structured signals. Pick the integration that matches your setup, or pipe sensors directly into your own consumer.
-
-Browse the full sensor catalog at [sensorhub.world2agent.ai](https://sensorhub.world2agent.ai).
-
-> **Security — install only sensors you trust.**
->
-> A sensor's signals drive what your agent perceives and does, so an untrusted sensor is effectively an untrusted instruction source. We strongly recommend installing only open-source sensors from authors you trust, and reviewing the code before running it.
-
-### Claude Code
-
-In an active Claude Code session, install the `world2agent` plugin:
+The fastest way to feel W2A is with Claude Code. In an active session, install the `world2agent` plugin:
 
 ```
 /plugin marketplace add machinepulse-ai/world2agent-plugins
@@ -125,51 +64,79 @@ In an active Claude Code session, install the `world2agent` plugin:
 Add a sensor — for example, Hacker News:
 
 ```
-/world2agent:sensor-add @world2agent/sensor-hacknews
+/world2agent:sensor-add @world2agent/sensor-hackernews
 ```
 
-Then restart Claude Code with the plugin channel loaded so sensor signals can be delivered into your session:
+Restart Claude Code with the plugin channel loaded so sensor signals flow into your session:
 
 ```bash
 claude --dangerously-load-development-channels plugin:world2agent@world2agent-plugins
 ```
 
-### More agent integrations
+> **Security — install only sensors you trust.** A sensor's signals drive what your agent perceives and does, so an untrusted sensor is effectively an untrusted instruction source. Stick to open-source sensors from authors you trust, and review the code first.
 
-More first-class agent integrations are on the way. Until then, any agent can consume W2A signals directly via the pipe mode below.
-
-### Pipe mode
-
-Every sensor ships as a standalone CLI, so you can pipe signals into any consumer — no plugin required:
+Or pipe directly to any agent runtime — no plugin needed:
 
 ```bash
-w2a-sensor-slack | your-consumer-app
+w2a-sensor-hackernews | your-agent
 ```
 
-***
+**Building your own agent?** See the [developer quick start](./docs/quick-start.md#option-2-code--sdk--sensor) for the SDK code path.
 
-## Build a sensor
+→ [Full guide](./docs/quick-start.md) · [Multi-sensor](./docs/multi-sensor.md) · [SensorHub](./docs/sensorhub.md)
 
-A sensor is an independent npm package that watches one source and emits `W2ASignal`. Install our skill and ask your coding agent to build it — the skill walks through source interrogation, signal design, scaffold, and install recipe:
+## Sensors
+
+### SensorHub
+
+Every sensor is a standard npm package. SensorHub is the discovery layer on top — browse the catalog at [world2agent.ai/hub](https://world2agent.ai/hub), or search npm directly:
 
 ```bash
-npx skills add https://github.com/machinepulse-ai/world2agent/skills/build-w2a-sensor
+npm search w2a-sensor
+npm install @world2agent/sensor-hackernews
 ```
 
-See the [TypeScript SDK](https://github.com/machinepulse-ai/world2agent-typescript-sdk) for the `defineSensor` / `run` / transport APIs.
+→ [SensorHub guide](./docs/sensorhub.md)
 
-***
+### Missing a sensor?
 
-## Contribute
+[Build your own](./docs/build-a-sensor.md) in ~50 lines. The `build-w2a-sensor` skill walks an AI coding agent through discovery, signal design, scaffolding, and the install recipe.
 
-World2Agent is an open protocol — the real breakthroughs come from the community. Ways to get involved:
+Once it's ready, ship it to npm:
 
-* **Publish a sensor** — pick a source you care about and build a sensor for it (see *Build a sensor* above). Once it's on npm, anyone can install it. High-quality sensors get surfaced on [sensorhub.world2agent.ai](https://sensorhub.world2agent.ai).
-* **Evolve the protocol** — propose schema changes via PR against [`schema/`](./schema). Protocol changes land here first, then flow into the SDK and plugins.
-* **Improve the SDK** — the reference TypeScript SDK lives at [`world2agent-typescript-sdk`](https://github.com/machinepulse-ai/world2agent-typescript-sdk). Help with transports, testing utilities, or SDKs in other languages.
-* **Add an agent integration** — bring W2A to another agent runtime via the [plugins repo](https://github.com/machinepulse-ai/world2agent-plugins).
-* **File issues & ideas** — bug reports, ambiguous schema fields, sensor wishlist entries all welcome.
+```bash
+npm publish
+```
+
+That's all it takes to share your sensor with the world — once published, it's installable by every W2A agent everywhere, and SensorHub indexes it for discovery.
+
+## Roadmap
+
+* **Graph layer** — compose and enrich signals from multiple sensors before they reach your agent. → [RFC](./docs/rfc-graph.md)
+
+## Contributing
+
+* 🔧 **Build a sensor** — `npm publish` and it's live
+
+* 🐛 **Report bugs** — [open an issue](https://github.com/machinepulse-ai/world2agent/issues)
+
+* 💡 **Suggest a sensor** — [Discussions](https://github.com/machinepulse-ai/world2agent/discussions)
+
+→ [Contributing guide](./docs/CONTRIBUTING.md)
+
+## Community
+
+[Website](https://machinepulse.ai/) · [X / Twitter](https://x.com/Karpo_AI) · [YouTube](https://www.youtube.com/channel/UCmuDMSxQp2LLJ4nrkPuCGQw)
+
+<!-- Star History — uncomment after launch -->
+<!-- [![Star History Chart](https://api.star-history.com/svg?repos=machinepulse-ai/world2agent&type=Date)](https://star-history.com/#machinepulse-ai/world2agent&Date) -->
 
 ## License
 
-Apache 2.0
+[Apache 2.0](./LICENSE)
+
+***
+
+<p align="center">
+  Built by <a href="https://machinepulse.ai">MachinePulse</a> · Open source, open protocol, open invitation.
+</p>
