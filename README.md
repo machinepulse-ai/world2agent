@@ -126,7 +126,7 @@ That's all it takes to share your sensor with the world — once published, it's
 
 ## Community
 
-[Website](https://machinepulse.ai/) · [Discord]([DISCORD_LINK]) · [X / Twitter](https://x.com/machinepulse) · [YouTube]([YOUTUBE_LINK])
+[Website](https://machinepulse.ai/) · [X / Twitter](https://x.com/Karpo_AI) · [YouTube](https://www.youtube.com/channel/UCmuDMSxQp2LLJ4nrkPuCGQw)
 
 <!-- Star History — uncomment after launch -->
 <!-- [![Star History Chart](https://api.star-history.com/svg?repos=machinepulse-ai/world2agent&type=Date)](https://star-history.com/#machinepulse-ai/world2agent&Date) -->
