@@ -44,7 +44,9 @@ Pick the highest available option — **do not default to polling if a push chan
 
 ### 3. What event types will it emit?
 
-List every triple it will emit as `domain.entity.action` (open namespace — you coin them). Examples: `slack.message.received`, `jira.issue.created`, `market.quote.threshold_crossed`. These strings are your sensor's public contract — consumers pattern-match against them, so stability matters.
+List every triple it will emit as `domain.entity.action` (open namespace — you coin them). Examples: `messaging.message.received`, `repo.issue.created`, `market.quote.threshold_crossed`. These strings are your sensor's public contract — consumers pattern-match against them, so stability matters.
+
+`domain` is the **abstract source space** (`messaging`, `repo`, `market`, `calendar`), **not the platform name**. The platform identity already lives in `source.source_type` (`"slack"`, `"github"`, `"jira"`). A Slack sensor emits `messaging.message.mentioned`, not `slack.message.mentioned` — that's what lets a consumer write `handler.on("messaging.message.mentioned")` once and match @-events from Slack, Discord, Lark, and Teams alike. `action` is a verb in past tense (`mentioned`, `opened`, `received`), not a gerund (`trending` ❌ → `trending_entered` ✅).
 
 ### 4. What config does the sensor need?
 
@@ -72,9 +74,11 @@ Three channels, three jobs. Keep them separate:
 
 | Field | Carries | Example |
 |---|---|---|
-| `event` | Normalized cross-source classification — `type`, `occurred_at`, `summary` | `type: "slack.message.mentioned"`, summary text |
+| `event` | Normalized cross-source classification — `type`, `occurred_at`, `summary` | `type: "messaging.message.mentioned"`, summary text |
 | `source_event` | Self-describing structured data from the source: `{ schema, data }` with JSON Schema draft-07 for `schema` | IDs, numbers, booleans, enums the graph/agent will reason over |
 | `attachments` | Unstructured content blobs (message bodies, diffs, images, audio) | Text body of the message, PDF file, screenshot |
+
+Every property in `source_event.schema` SHOULD carry a `description` — that's what makes the payload self-describing. A schema that only declares types (`{ "type": "integer" }`) leaves the consumer guessing what the value means; with a description (`{ "type": "integer", "description": "Stars gained in the last 24 hours" }`) an agent can reason about the data without sensor-specific knowledge.
 
 Never put structured machine data in an attachment. Never put large blobs in `source_event.data`.
 
@@ -109,13 +113,21 @@ Layout:
 
 ### `package.json`
 
-Substitute `<package-name>` and `<bin-name>` with whatever coordinates you publish under.
+Substitute `<package-name>` and `<bin-name>` with whatever coordinates you publish under. The `keywords` array is the discoverability contract — fill in the real `source_type` decided in Phase 1, do not leave the placeholder. `npm search w2a-sensor` and SensorHub indexing both rely on these keywords.
 
 ```json
 {
   "name": "<package-name>",
   "version": "0.1.0",
   "description": "W2A sensor — <one-line description>",
+  "keywords": [
+    "world2agent",
+    "w2a",
+    "w2a-sensor",
+    "sensor",
+    "agent",
+    "<source_type>"
+  ],
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -145,6 +157,8 @@ Substitute `<package-name>` and `<bin-name>` with whatever coordinates you publi
   }
 }
 ```
+
+The first five keywords are mandatory for every W2A sensor — they are how consumers discover sensors via `npm search`. The last entry is the `source_type` decided in Phase 1 (e.g. `"github"`, `"hackernews"`, `"slack"`). Add additional source-specific tags (`"trending"`, `"oauth"`, etc.) only if they would actually help discovery.
 
 The `w2a` block is tooling metadata the install CLI reads; it is not part of the wire protocol.
 
@@ -193,8 +207,12 @@ export function transform<Name>Event(/* source event args */): W2ASignal {
       summary: "...",                          // Phase 2 template
     },
     source_event: {
-      schema: { /* JSON Schema draft-07 describing `data` */ },
-      data:   { /* original event fields */ },
+      schema: {
+        /* JSON Schema draft-07 describing `data`.
+           Every property SHOULD carry a `description` so the payload
+           is self-describing without sensor-specific knowledge. */
+      },
+      data: { /* original event fields */ },
     },
     attachments: [
       {
