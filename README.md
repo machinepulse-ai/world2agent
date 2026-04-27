@@ -62,7 +62,7 @@ The fastest way to feel W2A is with Claude Code. In an active session, install t
 Add a sensor — for example, Hacker News:
 
 ```
-/world2agent:sensor-add @world2agent/sensor-hackernews
+/world2agent:sensor-add @world2agent/sensor-hackernews 
 ```
 
 Restart Claude Code with the plugin channel loaded so sensor signals flow into your session:
@@ -72,6 +72,12 @@ claude --dangerously-load-development-channels plugin:world2agent@world2agent-pl
 ```
 
 > **Security — install only sensors you trust.** A sensor's signals drive what your agent perceives and does, so an untrusted sensor is effectively an untrusted instruction source. Stick to open-source sensors from authors you trust, and review the code first.
+
+Native integrations for other agent runtimes are *coming soon*. In the meantime, pipe directly to any agent runtime — no plugin needed:
+
+```bash
+w2a-sensor-hackernews | your-agent
+```
 
 **Integrating W2A into your own agent system?** See the [developer quick start](./docs/quick-start.md#option-2-code--sdk--sensor) for the SDK code path.
 
