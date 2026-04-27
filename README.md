@@ -59,12 +59,11 @@ The fastest way to feel W2A is with Claude Code. In an active session, install t
 /reload-plugins
 ```
 
-Add a sensor — for example, Hacker News stories, frontier AI lab posts, or prediction markets:
+Add a sensor — for example, Hacker News stories, frontier AI lab posts:
 
 ```
 /world2agent:sensor-add @world2agent/sensor-hackernews
 /world2agent:sensor-add @quill-io/sensor-frontier-ai-news
-/world2agent:sensor-add @quill-io/sensor-polymarket
 ```
 
 → Browse the full catalog on [SensorHub](https://world2agent.ai/hub).
