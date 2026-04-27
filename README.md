@@ -94,7 +94,11 @@ Every sensor is a standard npm package — `npm search w2a-sensor` works as a fa
 
 ### Missing a sensor?
 
-[Build your own](./docs/build-a-sensor.md) in ~50 lines. The `build-w2a-sensor` skill walks an AI coding agent through discovery, signal design, scaffolding, and the install recipe.
+[Build your own](./docs/build-a-sensor.md) in ~50 lines. The `build-w2a-sensor` skill walks an AI coding agent through discovery, signal design, scaffolding, and the install recipe — install it with:
+
+```bash
+npx skills add https://github.com/machinepulse-ai/world2agent/skills/build-w2a-sensor
+```
 
 Once it's ready, ship it to npm:
 
@@ -102,7 +106,7 @@ Once it's ready, ship it to npm:
 npm publish
 ```
 
-That's all it takes to share your sensor with the world — once published, it's installable by every W2A agent everywhere, and SensorHub indexes it for discovery.
+That's it — your sensor is now installable by anyone, anywhere.
 
 ## Roadmap
 
