@@ -84,14 +84,11 @@ Native integrations for other agent runtimes are *coming soon*.
 
 ## Sensors
 
-### SensorHub
+### [SensorHub](https://world2agent.ai/hub)
 
-Every sensor is a standard npm package. SensorHub is the discovery layer on top — browse the catalog at [world2agent.ai/hub](https://world2agent.ai/hub), or search npm directly:
+**SensorHub is the catalog of every W2A sensor** — official and community-built, organized by what each one perceives (markets, news, production alerts, weather, AI labs, …). Browse it to see what's available, view each sensor's signal schema, and grab the one-line install command. **Looking for a sensor? Start here.**
 
-```bash
-npm search w2a-sensor
-npm install @world2agent/sensor-hackernews
-```
+Every sensor is a standard npm package — `npm search w2a-sensor` works as a fallback if you prefer the raw view.
 
 → [SensorHub guide](./docs/sensorhub.md)
 
