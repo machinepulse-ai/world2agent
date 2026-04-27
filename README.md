@@ -1,4 +1,4 @@
-![Welcome to World2Agent](https://private-user-images.githubusercontent.com/16631496/583882105-c724ab40-4f94-478e-b4c6-1c936e9a5677.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NzcyMTYxMDAsIm5iZiI6MTc3NzIxNTgwMCwicGF0aCI6Ii8xNjYzMTQ5Ni81ODM4ODIxMDUtYzcyNGFiNDAtNGY5NC00NzhlLWI0YzYtMWM5MzZlOWE1Njc3LnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNjA0MjYlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjYwNDI2VDE1MDMyMFomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPWJlOTBkYWRiNGU1MmM1MDRmYjQ1NjE4YjlmMTg2OGZkYTNhYjgwMzcyNjc4ZDg0NTQ1ZDdmMzIxOTMyNTU0MTQmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0JnJlc3BvbnNlLWNvbnRlbnQtdHlwZT1pbWFnZSUyRnBuZyJ9.lavbwz7h-tvI-ac2pCs_8EiPz44nCoQWqLzYL-lP5OA)
+![Welcome to World2Agent](https://world2agent.ai/assets/readme-banner.png)
 
 <p align="center">
   <i>Agents can't act on what they can't perceive.</i>
@@ -26,7 +26,7 @@
 </p>
 
 <p align="center">
-  <img src="https://private-user-images.githubusercontent.com/16631496/583881866-3da904c0-914b-4b5a-a818-768eebb75598.gif?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NzcyMTU5NTAsIm5iZiI6MTc3NzIxNTY1MCwicGF0aCI6Ii8xNjYzMTQ5Ni81ODM4ODE4NjYtM2RhOTA0YzAtOTE0Yi00YjVhLWE4MTgtNzY4ZWViYjc1NTk4LmdpZj9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNjA0MjYlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjYwNDI2VDE1MDA1MFomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTc5ZGIyNjY0MzQ2NGM4OTM3YjAwMTdjYjZiOTNkZjQ3OTYyMDUyNjM2MzM1OTZhYzc1OGEzNTU4YzAzZjUxZGImWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0JnJlc3BvbnNlLWNvbnRlbnQtdHlwZT1pbWFnZSUyRmdpZiJ9.JZPOSeaPAGwuAytD80mS2Z642LzgADPggbi0JBam35w" width="600" alt="star" />
+  <img src="https://world2agent.ai/assets/github-star.gif" width="600" alt="star" />
 </p>
 
 ***
@@ -73,13 +73,7 @@ claude --dangerously-load-development-channels plugin:world2agent@world2agent-pl
 
 > **Security — install only sensors you trust.** A sensor's signals drive what your agent perceives and does, so an untrusted sensor is effectively an untrusted instruction source. Stick to open-source sensors from authors you trust, and review the code first.
 
-Or pipe directly to any agent runtime — no plugin needed:
-
-```bash
-w2a-sensor-hackernews | your-agent
-```
-
-**Building your own agent?** See the [developer quick start](./docs/quick-start.md#option-2-code--sdk--sensor) for the SDK code path.
+**Integrating W2A into your own agent system?** See the [developer quick start](./docs/quick-start.md#option-2-code--sdk--sensor) for the SDK code path.
 
 → [Full guide](./docs/quick-start.md) · [Multi-sensor](./docs/multi-sensor.md) · [SensorHub](./docs/sensorhub.md)
 
@@ -124,7 +118,7 @@ That's all it takes to share your sensor with the world — once published, it's
 
 ## Community
 
-[Website](https://machinepulse.ai/) · [X / Twitter](https://x.com/MachinePulse_AI) · [YouTube](https://www.youtube.com/channel/UCmuDMSxQp2LLJ4nrkPuCGQw)
+[Website](https://machinepulse.ai/) · [X / Twitter](https://x.com/MachinePulse_AI) · [YouTube](https://youtube.com/@MachinePulse_AI) · [Discord](https://discord.gg/hDjaD8pX)
 
 <!-- Star History — uncomment after launch -->
 <!-- [![Star History Chart](https://api.star-history.com/svg?repos=machinepulse-ai/world2agent&type=Date)](https://star-history.com/#machinepulse-ai/world2agent&Date) -->

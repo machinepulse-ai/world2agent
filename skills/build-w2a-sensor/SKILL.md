@@ -439,6 +439,48 @@ If the summary is unreadable, your Phase 2 work wasn't thorough — go back.
 
 ---
 
+## Phase 6 — Offer to publish
+
+Once the sensor builds clean, the harness tests pass, and the install flow produces a sensible handler skill, the package works locally — but a sensor that lives only on the author's disk doesn't participate in the W2A ecosystem. Other users who want to perceive the same source have no way to find or install it.
+
+**Do not publish unprompted.** Ask the user first, in plain language, something like:
+
+> "The sensor is working locally. Want to publish it to npm so others with the same need can install it directly? It'll be discoverable via `npm search w2a-sensor` and listable in SensorHub once that launches. If you'd rather keep it private for now, that's fine — you can publish later."
+
+If the user declines, stop here. Note that they can revisit publishing any time; do not nag.
+
+If the user agrees, walk them through the checks below before running the publish command — do not run `npm publish` silently.
+
+1. **Pre-flight the manifest.** Confirm `package.json` is publish-ready:
+   - `name` — final coordinates (scoped names like `@your-scope/sensor-<source>` are fine and recommended; they avoid name squatting).
+   - `version` — start at `0.1.0`; bump per semver on every subsequent publish.
+   - `description`, `keywords` (the five mandatory W2A tags + `<source_type>`), `license`, `repository`, `homepage`, `author` — registries and SensorHub surface these.
+   - `files` — already restricts to `dist`, `SETUP.md`, `README.md`; double-check no secrets or fixtures leak in. Run `npm pack --dry-run` to preview the tarball contents.
+   - `w2a` block — `source_type` and `signals` reflect Phase 1 / Phase 2 final answers, not placeholders.
+
+2. **Verify the build artifact ships.** `pnpm build` (or equivalent) and confirm `dist/` exists with `index.js`, `index.d.ts`, and `bin.js`. The bin file should start with the `#!/usr/bin/env node` shebang so `npx <bin-name>` works after install.
+
+3. **Login + dry-run.** `npm whoami` to confirm the right account; `npm publish --dry-run` to preview what would upload. Read the file list out loud — if anything looks wrong, fix `files` / `.npmignore` rather than YOLO-ing the publish.
+
+4. **Publish.**
+   - Public scoped package: `npm publish --access public` (scoped packages default to private; the flag is required on first publish).
+   - Unscoped package: `npm publish`.
+   - 2FA-protected account: have the user ready with their OTP.
+
+5. **Smoke-test the published artifact.** In a scratch directory: `npm view <package-name>` to confirm the registry sees it, then dry-run the install flow against the published name (`/world2agent:sensor-add <package-name>` in Claude Code) — not the local path — to confirm `SETUP.md` is in the tarball and the Q&A still works end-to-end.
+
+6. **Tag the release.** `git tag v0.1.0 && git push --tags` so the npm version maps back to a commit.
+
+7. **Submit to SensorHub.** After a successful publish, point the user to https://world2agent.ai/hub/submit to register their package. Phrase it as an invitation, not a chore — something like:
+
+   > "Publish succeeded 🎉 Open https://world2agent.ai/hub/submit to list your sensor on SensorHub so other users can find and install it. You'll just need the package name; the rest is pulled from npm."
+
+   SensorHub is the discovery surface beyond `npm search`. Submitting is what turns a published package into something other W2A users actually find.
+
+If publishing fails for a reason you don't immediately understand (E403, name conflict, 2FA loop), stop and surface the error to the user — do not retry blindly with version bumps.
+
+---
+
 ## Rules
 
 - **Protocol is authoritative.** For any field shape or naming rule, https://github.com/machinepulse-ai/world2agent wins. This skill mirrors it; if the two drift, fix the skill.
