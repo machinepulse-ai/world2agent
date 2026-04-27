@@ -1,7 +1,7 @@
-![Welcome to World2Agent](./docs/images/readme-banner.png)
+![Welcome to World2Agent](https://world2agent.ai/assets/readme-banner.png)
 
 <p align="center">
-  <strong>Agents can't act on what they can't perceive.</strong>
+  <i>Agents can't act on what they can't perceive.</i>
 </p>
 
 <p align="center">
@@ -22,13 +22,11 @@
 <p align="center">
   <a href="https://world2agent.ai/assets/promo-w2a.mp4">
     Watch the W2A Concept Video
+  </a>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/github/stars/machinepulse-ai/world2agent?style=social" alt="GitHub Stars" />
-</p>
-<p align="center">
-  Like what you see? Give us a ⭐ — every star helps more developers discover W2A.
+  <img src="https://world2agent.ai/assets/github-star.gif" width="600" alt="star" />
 </p>
 
 ***
@@ -75,13 +73,7 @@ claude --dangerously-load-development-channels plugin:world2agent@world2agent-pl
 
 > **Security — install only sensors you trust.** A sensor's signals drive what your agent perceives and does, so an untrusted sensor is effectively an untrusted instruction source. Stick to open-source sensors from authors you trust, and review the code first.
 
-Or pipe directly to any agent runtime — no plugin needed:
-
-```bash
-w2a-sensor-hackernews | your-agent
-```
-
-**Building your own agent?** See the [developer quick start](./docs/quick-start.md#option-2-code--sdk--sensor) for the SDK code path.
+**Integrating W2A into your own agent system?** See the [developer quick start](./docs/quick-start.md#option-2-code--sdk--sensor) for the SDK code path.
 
 → [Full guide](./docs/quick-start.md) · [Multi-sensor](./docs/multi-sensor.md) · [SensorHub](./docs/sensorhub.md)
 
@@ -126,7 +118,7 @@ That's all it takes to share your sensor with the world — once published, it's
 
 ## Community
 
-[Website](https://machinepulse.ai/) · [X / Twitter](https://x.com/Karpo_AI) · [YouTube](https://www.youtube.com/channel/UCmuDMSxQp2LLJ4nrkPuCGQw)
+[Website](https://machinepulse.ai/) · [X / Twitter](https://x.com/MachinePulse_AI) · [YouTube](https://youtube.com/@MachinePulse_AI) · [Discord](https://discord.gg/hDjaD8pX)
 
 <!-- Star History — uncomment after launch -->
 <!-- [![Star History Chart](https://api.star-history.com/svg?repos=machinepulse-ai/world2agent&type=Date)](https://star-history.com/#machinepulse-ai/world2agent&Date) -->
