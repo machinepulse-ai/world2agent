@@ -51,7 +51,11 @@ Sensors watch data sources and emit structured data following W2A Protocol. Your
 
 ## Quick Start
 
-The fastest way to feel W2A is with Claude Code. In an active session, install the `world2agent` plugin:
+W2A ships with native [agent-runtime plugins](https://github.com/machinepulse-ai/world2agent-plugins) for Claude Code, Hermes, and OpenClaw — pick whichever runtime you already use.
+
+### Claude Code
+
+In an active session, install the `world2agent` plugin:
 
 ```
 /plugin marketplace add machinepulse-ai/world2agent-plugins
@@ -66,17 +70,57 @@ Add a sensor — for example, Hacker News stories, frontier AI lab posts:
 /world2agent:sensor-add @quill-io/sensor-frontier-ai-news
 ```
 
-→ Browse the full catalog on [SensorHub](https://world2agent.ai/hub).
-
 Restart Claude Code with the plugin channel loaded so sensor signals flow into your session:
 
 ```bash
 claude --dangerously-load-development-channels plugin:world2agent@world2agent-plugins
 ```
 
-> **Security — install only sensors you trust.** A sensor's signals drive what your agent perceives and does, so an untrusted sensor is effectively an untrusted instruction source. Stick to open-source sensors from authors you trust, and review the code first.
+### Hermes
 
-Native integrations for other agent runtimes are *coming soon*.
+Install the bridge once:
+
+```bash
+npm install -g @world2agent/hermes-sensor-bridge
+hermes skills install machinepulse-ai/world2agent-plugins/hermes-sensor-bridge/skills/world2agent-manage
+```
+
+In an interactive `hermes` session, describe the intent in natural language or use the slash form — the agent handles npm install, `SETUP.md` Q&A, webhook subscription, and subprocess startup:
+
+```
+/world2agent-manage add @world2agent/sensor-hackernews
+```
+
+> First time only: the agent will ask you to restart `hermes gateway` once after it enables the webhook platform. Every install after that is seamless.
+
+Each signal triggers a fresh `AIAgent.run_conversation()` against the generated handler skill.
+
+### OpenClaw
+
+Three steps:
+
+```bash
+npm install -g @world2agent/openclaw-sensor-bridge
+openclaw skills install world2agent-manage
+```
+
+Then send this in your OpenClaw chat:
+
+```
+Use world2agent-manage skill install @quill-io/sensor-frontier-ai-news
+```
+
+The skill walks the SETUP.md Q&A, generates a handler skill, registers the sensor, and starts the supervisor. Subsequent signals each trigger a fresh `/hooks/agent` call against the handler.
+
+> First time only: the bridge writes a managed `hooks` block into `~/.openclaw/openclaw.json` (auto-generates `hooks.token` if absent) and asks you to run `openclaw gateway restart` once. A timestamped backup of the original config is kept next to the file. Every install after that is seamless.
+
+If you have a paired chat platform (Feishu, iMessage, Telegram, …) configured via `<PLATFORM>_HOME_CHANNEL` in `~/.openclaw/.env`, replies are auto-pushed to that chat by default.
+
+---
+
+→ Browse the full catalog on [SensorHub](https://world2agent.ai/hub).
+
+> **Security — install only sensors you trust.** A sensor's signals drive what your agent perceives and does, so an untrusted sensor is effectively an untrusted instruction source. Stick to open-source sensors from authors you trust, and review the code first.
 
 **Integrating W2A into your own agent system?** See the [developer quick start](./docs/quick-start.md#option-2-code--sdk--sensor) for the SDK code path.
 
