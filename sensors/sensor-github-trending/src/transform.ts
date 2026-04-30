@@ -138,15 +138,42 @@ function buildSummary(
   repos: TrendingRepo[],
 ): string {
   if (repos.length === 0) {
-    return `GitHub Trending ${window} digest: no repos returned by github.com/trending; the scraper may need updating.`;
+    return `🔥 GitHub Trending — no repos returned by github.com/trending?since=${window}; the scraper may need updating.`;
   }
   const lead = repos[0];
-  const sample = repos
-    .slice(0, Math.min(3, repos.length))
-    .map((r) => r.full_name)
-    .join(", ");
-  const langs = uniqueLanguages(repos).slice(0, 3).join(", ") || "mixed languages";
-  return `GitHub Trending ${window} digest: top ${repos.length} repos (${sample}…) led by ${lead.full_name} (+${lead.stars_gained_in_window.toLocaleString()} stars ${windowLabel}); covers ${langs}.`;
+  const dateStr = formatDate(new Date());
+  const langSummary =
+    uniqueLanguages(repos)
+      .slice(0, 4)
+      .map((l) => `${langEmoji(l)} ${l}`)
+      .join(" · ") || "mixed languages";
+
+  const lines: string[] = [];
+  lines.push(
+    `🔥 GitHub Trending — ${capitalise(window)} Digest (${dateStr}) · top ${repos.length}`,
+  );
+  lines.push(
+    `📊 Lead: ${lead.full_name} +${lead.stars_gained_in_window.toLocaleString()} ⭐ ${windowLabel} · ${langSummary}`,
+  );
+  lines.push("");
+  for (const r of repos) {
+    lines.push(formatRepoLine(r, windowLabel));
+  }
+  lines.push("");
+  lines.push(`🔗 Full live list: https://github.com/trending?since=${window}`);
+  return lines.join("\n");
+}
+
+function formatRepoLine(r: TrendingRepo, windowLabel: string): string {
+  const langTag = r.language ? `${langEmoji(r.language)} ${r.language}` : "🧩 unknown";
+  const heat = heatBadge(r);
+  const blurb = oneLineBlurb(r);
+  // Two-line per repo: header (rank + name + stats + heat) and indented blurb.
+  // `[name](url)` makes the link clickable in any markdown renderer.
+  return [
+    `${rankEmoji(r.rank)} **[${r.full_name}](${r.url})** · ${langTag} · ⭐ ${r.stars_total.toLocaleString()} (+${r.stars_gained_in_window.toLocaleString()} ${windowLabel}) · ${heat}`,
+    `   ↳ ${blurb}`,
+  ].join("\n");
 }
 
 function buildMarkdown(
@@ -154,15 +181,180 @@ function buildMarkdown(
   windowLabel: string,
   repos: TrendingRepo[],
 ): string {
-  const header = `# GitHub Trending — ${window} digest\n\nTop ${repos.length} repos on https://github.com/trending?since=${window}.\n\n`;
-  const body = repos
-    .map((r) => {
-      const lang = r.language ? ` · ${r.language}` : "";
-      const desc = r.description ? `\n  ${r.description}` : "";
-      return `${r.rank}. **[${r.full_name}](${r.url})** — ★ ${r.stars_total.toLocaleString()} (+${r.stars_gained_in_window.toLocaleString()} ${windowLabel}) · ⑂ ${r.forks.toLocaleString()}${lang}${desc}`;
-    })
-    .join("\n");
-  return header + body + "\n";
+  const dateStr = formatDate(new Date());
+  const langSummary =
+    uniqueLanguages(repos)
+      .slice(0, 6)
+      .map((l) => `${langEmoji(l)} ${l}`)
+      .join(" · ") || "mixed";
+
+  const out: string[] = [];
+  out.push(`# 🔥 GitHub Trending — ${capitalise(window)} Digest`);
+  out.push(``);
+  out.push(`📅 **${dateStr}** · top ${repos.length} on github.com/trending?since=${window}`);
+  out.push(`🏷️ **Languages:** ${langSummary}`);
+  out.push(``);
+  out.push(`---`);
+  out.push(``);
+
+  for (const r of repos) {
+    const langTag = r.language ? `${langEmoji(r.language)} ${r.language}` : "🧩 unknown";
+    const heat = heatBadge(r);
+    const useCase = useCaseHint(r);
+    const whyHot = whyHotReason(r, windowLabel);
+
+    out.push(
+      `## ${rankEmoji(r.rank)} [${r.full_name}](${r.url})`,
+    );
+    out.push(``);
+    out.push(
+      `${langTag} · ⭐ **${r.stars_total.toLocaleString()}** (+${r.stars_gained_in_window.toLocaleString()} ${windowLabel}) · ⑂ ${r.forks.toLocaleString()} · ${heat}`,
+    );
+    out.push(``);
+    if (r.description) {
+      out.push(`> ${r.description}`);
+      out.push(``);
+    }
+    out.push(`- 🚀 **Why it's hot:** ${whyHot}`);
+    out.push(`- 🛠️ **Use it for:** ${useCase}`);
+    out.push(`- 🔗 ${r.url}`);
+    out.push(``);
+  }
+
+  return out.join("\n");
+}
+
+/* ──────────────────────────────────────────────────────────── */
+/*  Heuristics — derived from data we already have, no extra    */
+/*  network calls. Cheap, deterministic, good enough for triage.*/
+/* ──────────────────────────────────────────────────────────── */
+
+function heatBadge(r: TrendingRepo): string {
+  if (r.stars_total === 0) return "🆕 brand new";
+  const ratio = r.stars_gained_in_window / r.stars_total;
+  if (ratio > 0.5) return "🆕 brand new (most stars came this window)";
+  if (ratio > 0.15) return "🚀 surging";
+  if (r.stars_total >= 50_000) return "🏆 established giant trending again";
+  if (r.stars_gained_in_window >= 1_000) return "📈 strong momentum";
+  return "📈 climbing";
+}
+
+function whyHotReason(r: TrendingRepo, windowLabel: string): string {
+  const ratio = r.stars_total > 0 ? r.stars_gained_in_window / r.stars_total : 0;
+  if (ratio > 0.5) {
+    return `New project — ${Math.round(ratio * 100)}% of total stars (${r.stars_gained_in_window.toLocaleString()} of ${r.stars_total.toLocaleString()}) were earned ${windowLabel}.`;
+  }
+  if (ratio > 0.15) {
+    return `Strong momentum — gained ${r.stars_gained_in_window.toLocaleString()} stars (${Math.round(ratio * 100)}% relative growth) ${windowLabel}.`;
+  }
+  if (r.stars_total >= 50_000) {
+    return `Long-running project resurfacing — ${r.stars_gained_in_window.toLocaleString()} new stars on top of ${r.stars_total.toLocaleString()} total ${windowLabel}.`;
+  }
+  return `Steady climb — ${r.stars_gained_in_window.toLocaleString()} stars ${windowLabel} (${r.stars_total.toLocaleString()} total).`;
+}
+
+/**
+ * Best-effort one-line "what is this" for `event.summary`. Falls back to
+ * the GitHub description. Only enrich when description is empty/short.
+ */
+function oneLineBlurb(r: TrendingRepo): string {
+  const desc = (r.description || "").trim();
+  if (desc.length >= 30) return truncate(desc, 160);
+  const cat = categoryHint(r);
+  if (desc) return `${desc} (${cat})`;
+  return cat;
+}
+
+/**
+ * What you might do with it — heuristic from name + description + language.
+ * The agent should still reason from the README; this is a triage hint.
+ */
+function useCaseHint(r: TrendingRepo): string {
+  const cat = categoryHint(r);
+  const desc = (r.description || "").trim();
+  if (desc) return `${cat}. ${truncate(desc, 200)}`;
+  return cat;
+}
+
+function categoryHint(r: TrendingRepo): string {
+  const text = `${r.name} ${r.description ?? ""}`.toLowerCase();
+  const has = (...words: string[]) => words.some((w) => text.includes(w));
+
+  if (has("agent", "autonom", "claude", "gpt-", "llm", "rag")) {
+    return "AI agent / LLM tooling — wire into your agent stack or study the prompts";
+  }
+  if (has("model", "transformer", "diffusion", "training", "fine-tun", "inference")) {
+    return "ML model / training infra — reference for model engineering";
+  }
+  if (has("framework", "library", "sdk", "toolkit")) {
+    return "Dev framework / SDK — drop-in dependency";
+  }
+  if (has("cli", "terminal", "tui")) {
+    return "CLI / terminal tool — install and use directly";
+  }
+  if (has("api", "server", "gateway", "proxy", "middleware")) {
+    return "Backend / API service — self-host or study the architecture";
+  }
+  if (has("ui", "component", "design", "tailwind", "shadcn")) {
+    return "UI components / design system — copy into your frontend";
+  }
+  if (has("docker", "kubernetes", "k8s", "devops", "deploy", "infra", "ci/cd")) {
+    return "DevOps / infra — study or adopt for ops";
+  }
+  if (has("security", "vuln", "exploit", "pentest", "hack", "fuzz")) {
+    return "Security tooling — defensive use / pentest practice";
+  }
+  if (has("game", "engine", "shader")) {
+    return "Game / graphics — study or fork";
+  }
+  if (has("awesome", "list", "resources", "tutorial", "course", "book")) {
+    return "Curated resources — bookmark for learning";
+  }
+  if (has("trading", "finance", "quant", "market")) {
+    return "Finance / trading tooling — study the strategies or self-host";
+  }
+  if (r.language === "Python") return "Python project — pip install and try";
+  if (r.language === "TypeScript" || r.language === "JavaScript") {
+    return "JS/TS project — npm install and try";
+  }
+  if (r.language === "Rust") return "Rust project — cargo add and try";
+  if (r.language === "Go") return "Go project — go install and try";
+  return "General-purpose project — read the README to see what fits";
+}
+
+function langEmoji(lang: string): string {
+  const map: Record<string, string> = {
+    Python: "🐍",
+    TypeScript: "🟦",
+    JavaScript: "🟨",
+    Rust: "🦀",
+    Go: "🐹",
+    Java: "☕",
+    Kotlin: "🟪",
+    Swift: "🟧",
+    "C++": "➕",
+    C: "🔵",
+    "C#": "🎯",
+    Ruby: "💎",
+    PHP: "🐘",
+    Shell: "🐚",
+    HTML: "🌐",
+    CSS: "🎨",
+    Vue: "🟢",
+    Svelte: "🟠",
+    Lua: "🌙",
+    Dart: "🎯",
+    Solidity: "💠",
+    Zig: "⚡",
+  };
+  return map[lang] ?? "🧩";
+}
+
+function rankEmoji(rank: number): string {
+  if (rank === 1) return "🥇";
+  if (rank === 2) return "🥈";
+  if (rank === 3) return "🥉";
+  return `#${rank}`;
 }
 
 function uniqueLanguages(repos: TrendingRepo[]): string[] {
@@ -175,4 +367,17 @@ function uniqueLanguages(repos: TrendingRepo[]): string[] {
     }
   }
   return out;
+}
+
+function truncate(s: string, max: number): string {
+  if (s.length <= max) return s;
+  return s.slice(0, max - 1).trimEnd() + "…";
+}
+
+function capitalise(s: string): string {
+  return s.length === 0 ? s : s[0].toUpperCase() + s.slice(1);
+}
+
+function formatDate(d: Date): string {
+  return d.toISOString().slice(0, 10);
 }

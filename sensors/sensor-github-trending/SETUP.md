@@ -74,9 +74,9 @@ description: Handle GitHub Trending digest signals (repo.trending.refreshed). Us
 
 ## Signal Shape
 - `event.type`: `repo.trending.refreshed`
-- `event.summary`: lead repo, top 3 sample, dominant languages, star delta on the lead.
+- `event.summary`: multi-line, emoji-rich. Header line + per-repo line (rank emoji, name link, language, ⭐ delta, heat badge) + one-line blurb under each. An agent reading only the summary can already triage; deeper reasoning lives in `attachments[0]`.
 - `source_event.data`: `{ window, captured_at, source_url, repo_count, repos[] }`. Each repo entry carries `{ rank, full_name, url, description, language, stars_total, stars_gained_in_window, forks }`.
-- `attachments[0]` (inline `text/markdown`): pre-formatted human-readable digest of the top N repos. Read this first.
+- `attachments[0]` (inline `text/markdown`): rich digest — per-repo section with description quote, "Why it's hot" reasoning (derived from star ratios), "Use it for" category hint, and the canonical URL. Read this when the user wants details on a specific repo.
 - `attachments[1]` (reference `text/html`): live github.com/trending URL. Fetch only if the inline digest is stale or insufficient.
 
 ## Priority & Handling
