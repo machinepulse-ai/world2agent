@@ -1,0 +1,52 @@
+{
+  "name": "@world2agent/sensor-github-trending",
+  "version": "0.1.0",
+  "description": "W2A sensor — periodic digest of trending repositories on GitHub (daily or weekly).",
+  "keywords": [
+    "world2agent",
+    "w2a",
+    "w2a-sensor",
+    "sensor",
+    "agent",
+    "github",
+    "trending"
+  ],
+  "license": "Apache-2.0",
+  "author": "MachinePulse AI",
+  "homepage": "https://github.com/machinepulse-ai/world2agent",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/machinepulse-ai/world2agent.git",
+    "directory": "sensors/sensor-github-trending"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" }
+  },
+  "bin": { "w2a-sensor-github-trending": "./dist/bin.js" },
+  "scripts": {
+    "start": "node dist/bin.js",
+    "build": "tsc --build",
+    "clean": "rm -rf dist *.tsbuildinfo",
+    "smoke": "node dist/smoke.js"
+  },
+  "dependencies": {
+    "@world2agent/sdk": "^0.1.0-alpha.1",
+    "cheerio": "^1.0.0",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "typescript": "^5.8.0"
+  },
+  "files": ["dist", "SETUP.md", "README.md"],
+  "engines": { "node": ">=20" },
+  "w2a": {
+    "type": "sensor",
+    "source_type": "github",
+    "signals": ["repo.trending.refreshed"],
+    "setup": "./SETUP.md"
+  }
+}
