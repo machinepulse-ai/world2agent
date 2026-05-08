@@ -138,7 +138,8 @@ Substitute `<package-name>` and `<bin-name>` with whatever coordinates you publi
   "scripts": {
     "start": "node dist/bin.js",
     "build": "tsc --build",
-    "clean": "rm -rf dist *.tsbuildinfo"
+    "clean": "rm -rf dist *.tsbuildinfo",
+    "postpublish": "npx -y @world2agent/notify-hub || true"
   },
   "dependencies": {
     "@world2agent/sdk": "^0.1.0",
@@ -471,11 +472,11 @@ If the user agrees, walk them through the checks below before running the publis
 
 6. **Tag the release.** `git tag v0.1.0 && git push --tags` so the npm version maps back to a commit.
 
-7. **Submit to SensorHub.** After a successful publish, point the user to https://world2agent.ai/hub/submit to register their package. Phrase it as an invitation, not a chore — something like:
+7. **SensorHub auto-registers.** The scaffolded `postpublish` script POSTs `{package_name, version}` to `https://world2agent.ai/api/v1/sensors/notify` immediately after `npm publish` succeeds; the listing typically appears at `https://world2agent.ai/hub/<slug>` within ~30 seconds. The CLI prints either `listed: <name>@<ver> → <hub_url>` (verified) or `queued: ... (verifying via npm; up to 24h)` (npm CDN propagation in progress).
 
-   > "Publish succeeded 🎉 Open https://world2agent.ai/hub/submit to list your sensor on SensorHub so other users can find and install it. You'll just need the package name; the rest is pulled from npm."
+   Three fallback layers cover failure modes: server-side retry up to 8 attempts over 24h handles npm propagation delay; a daily `discoverNewSensors` cron sweeps `npm search keywords:w2a-sensor` for anything the hook missed; and the manual `https://world2agent.ai/hub/submit` form remains available for opt-in retroactive listing. Treat the auto path as the default — only mention `/hub/submit` if the user explicitly asks to list manually or the auto path errored without recovery.
 
-   SensorHub is the discovery surface beyond `npm search`. Submitting is what turns a published package into something other W2A users actually find.
+   If the user already has a custom `postpublish` script, append `&& npx -y @world2agent/notify-hub || true` to it. The trailing `|| true` is load-bearing — it ensures a hub outage never marks the publish as failed in `set -e` CI.
 
 If publishing fails for a reason you don't immediately understand (E403, name conflict, 2FA loop), stop and surface the error to the user — do not retry blindly with version bumps.
 
@@ -498,6 +499,7 @@ If publishing fails for a reason you don't immediately understand (E403, name co
 - **`SensorStore` is string-only** — `JSON.stringify` / `JSON.parse` for structured data.
 - **Always return a cleanup function** from `start()`.
 - **Call `ctx.reportHealth()`** — `ok` on start, `degraded` on transient error, `error` on fatal.
+- **`postpublish` auto-notifies SensorHub.** Scaffolded `package.json` includes `postpublish: npx -y @world2agent/notify-hub || true`, which calls `https://world2agent.ai/api/v1/sensors/notify` so the package lists itself within ~30s of `npm publish`. Failure-safe (`|| true`) and idempotent. Removing this line falls back to the daily `discoverNewSensors` cron + manual `/hub/submit`.
 
 ## Links
 
