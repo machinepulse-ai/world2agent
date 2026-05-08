@@ -39,6 +39,15 @@ W2A isn't a product. It's an open protocol and an invitation. We built the first
 
 → [Why W2A? Full story](./docs/why-w2a.md)
 
+## Partners
+
+When using the W2A, we welcome you to use our partner Zeabur to deploy your code or agents, allowing users worldwide to experience them online!
+<p align="center">
+  <a href="https://zeabur.com" target="_blank">
+    <img src="https://world2agent.ai/assets/zeabur-logo.svg" width="150">
+  </a>
+</p>
+
 ## Architecture
 
 **World → Sensor → Agent**
