@@ -4,9 +4,12 @@
   "version": "0.1.0",
   "description": "World2Agent protocol — canonical schema (wire format)",
   "scripts": {
-    "gen:schema": "typescript-json-schema schema/0.1/tsconfig.json '*' --out schema/0.1/schema.json --required --strictNullChecks --topRef --noExtraProps=false"
+    "gen:schema": "typescript-json-schema schema/0.1/tsconfig.json '*' --out schema/0.1/schema.json --required --strictNullChecks --topRef --noExtraProps=false",
+    "validate:examples": "node scripts/validate-examples.mjs"
   },
   "devDependencies": {
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
     "typescript-json-schema": "^0.65.1"
   }
 }
