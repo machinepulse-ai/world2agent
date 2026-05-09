@@ -324,7 +324,7 @@ export type <Name>Config = z.infer<typeof <name>ConfigSchema>;
 
 ## Phase 4 — Author SETUP.md (the install experience)
 
-`SETUP.md` is what the consumer agent reads when installing a sensor (via `/world2agent:sensor-add <package>` in Claude Code, or the equivalent skill/tool in Codex / OpenClaw). It must:
+`SETUP.md` is what the consumer agent reads when installing a sensor (via `/world2agent:sensor-add <package>` in Claude Code, or the equivalent skill/tool in Hermes / OpenClaw). It must:
 
 1. Describe the sensor in one paragraph.
 2. Declare every config parameter in a table (written to `~/.world2agent/config.json`).
