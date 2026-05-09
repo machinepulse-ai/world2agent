@@ -28,6 +28,10 @@ Restart Claude Code with the plugin channel loaded so sensor signals can be deli
 claude --dangerously-load-development-channels plugin:world2agent@world2agent-plugins
 ```
 
+> **After changing your sensor set mid-session, call `reload_sensors`.**
+>
+> Whenever you run `/world2agent:sensor-add` or `/world2agent:sensor-remove`, or hand-edit `~/.world2agent/config.json`, ask Claude to call the `reload_sensors` MCP tool. It diffs the config file against the running set — new sensors start, removed sensors stop, config-changed sensors restart. No session restart needed. Without it, the host silently keeps running the old sensor set.
+
 Browse the full sensor catalog at [world2agent.ai/hub](https://world2agent.ai/hub).
 
 ## Option 2: Code — SDK + Sensor
