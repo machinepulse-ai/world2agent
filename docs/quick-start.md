@@ -35,7 +35,7 @@ Browse the full sensor catalog at [world2agent.ai/hub](https://world2agent.ai/hu
 For agents you're writing yourself. Install the SDK and a sensor:
 
 ```bash
-npm install @world2agent/sdk @world2agent/sensor-github
+npm install @world2agent/sdk @world2agent/sensor-hackernews
 ```
 
 Start receiving signals:
@@ -43,26 +43,22 @@ Start receiving signals:
 ```typescript
 import { run } from "@world2agent/sdk/sensor";
 import { createSignalHandler } from "@world2agent/sdk/consumer";
-import github from "@world2agent/sensor-github";
+import hackernews from "@world2agent/sensor-hackernews";
 
 // 1. Create a handler — an event router for incoming signals
 const handler = createSignalHandler();
 
 // 2. Register listeners for each event type you care about
-//    `domain` is the abstract source space (`repo`), not the platform name —
+//    `domain` is the abstract source space (`news`), not the platform name —
 //    the platform identity is in `signal.source.source_type`.
-handler.on("repo.trending.entered", async (signal) => {
-  console.log("Trending:", signal.event.summary);
+handler.on("news.story.trending", async (signal) => {
+  console.log("Trending story:", signal.event.summary);
   // Your agent logic here
 });
 
-handler.on("repo.star.added", async (signal) => {
-  console.log("New star:", signal.event.summary);
-});
-
 // 3. Run the sensor — signals flow in, your agent decides what to do
-await run(github, {
-  config: { token: "xxx" },
+await run(hackernews, {
+  config: { min_score: 100, min_comments: 20 },
   onSignal: (signal) => handler.handle(signal),
 });
 ```
@@ -72,7 +68,7 @@ await run(github, {
 Every sensor is also a standalone CLI. Pipe it directly to your agent:
 
 ```bash
-w2a-sensor-github | your-agent
+w2a-sensor-hackernews | your-agent
 ```
 
 No SDK, no TypeScript, no setup. The sensor emits W2A-formatted JSON to stdout, your agent reads stdin. More first-class agent integrations are on the way; until then this is how any runtime can consume W2A.
