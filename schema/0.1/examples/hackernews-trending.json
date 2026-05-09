@@ -1,0 +1,51 @@
+{
+  "signal_id": "c6e1d8a0-3f4e-4b2c-9d7a-8e5b1f3c2a90",
+  "schema_version": "w2a/0.1",
+  "emitted_at": 1781256000000,
+  "source": {
+    "sensor_id": "@world2agent/sensor-hackernews",
+    "sensor_version": "0.1.0-alpha.1",
+    "source_type": "hackernews",
+    "user_identity": "tomte",
+    "package": "@world2agent/sensor-hackernews"
+  },
+  "event": {
+    "type": "news.story.trending",
+    "occurred_at": 1781200000000,
+    "summary": "[HOT] [DISCUSSING] #3 (542pts, 187 comments) Postgres 18 ships per-statement plan caching"
+  },
+  "source_event": {
+    "schema": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "number", "description": "Hacker News story id" },
+        "title": { "type": "string", "description": "Story title" },
+        "url": { "type": "string", "description": "External link, falls back to the HN item URL when the story is text-only" },
+        "hn_url": { "type": "string", "description": "Canonical HN item URL" },
+        "score": { "type": "number", "description": "Upvote count at the time of emission" },
+        "comments": { "type": "number", "description": "Comment count at the time of emission" },
+        "author": { "type": "string", "description": "HN account that submitted the story" },
+        "rank": { "type": "number", "description": "Front-page position (1-based) at the time of emission" }
+      },
+      "required": ["id", "title", "hn_url", "score", "comments", "author", "rank"]
+    },
+    "data": {
+      "id": 41523001,
+      "title": "Postgres 18 ships per-statement plan caching",
+      "url": "https://www.postgresql.org/about/news/postgresql-18-released",
+      "hn_url": "https://news.ycombinator.com/item?id=41523001",
+      "score": 542,
+      "comments": 187,
+      "author": "tomte",
+      "rank": 3
+    }
+  },
+  "attachments": [
+    {
+      "type": "inline",
+      "mime_type": "text/plain",
+      "description": "Story title and link",
+      "data": "Postgres 18 ships per-statement plan caching\nhttps://www.postgresql.org/about/news/postgresql-18-released"
+    }
+  ]
+}

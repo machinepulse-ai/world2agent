@@ -1,0 +1,40 @@
+name: Protocol checks
+
+permissions:
+  contents: read
+
+on:
+  pull_request:
+    paths:
+      - "schema/**"
+      - "scripts/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/protocol.yml"
+  push:
+    branches: [main]
+
+jobs:
+  schema:
+    name: Schema sync + example validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - run: npm ci
+
+      - name: Verify schema.json is up-to-date with schema.ts
+        run: |
+          npm run gen:schema
+          if ! git diff --exit-code schema/0.1/schema.json; then
+            echo "::error::schema/0.1/schema.json is out of sync with schema.ts. Run 'npm run gen:schema' and commit the result."
+            exit 1
+          fi
+
+      - name: Validate example signals against schema
+        run: npm run validate:examples
