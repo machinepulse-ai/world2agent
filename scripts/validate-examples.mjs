@@ -47,7 +47,15 @@ if (examples.length === 0) {
 
 let failed = 0;
 for (const path of examples) {
-  const data = JSON.parse(readFileSync(path, "utf8"));
+  let data;
+  try {
+    data = JSON.parse(readFileSync(path, "utf8"));
+  } catch (err) {
+    failed += 1;
+    console.error(`fail ${path}`);
+    console.error(`     (root) invalid JSON: ${err.message}`);
+    continue;
+  }
   if (validate(data)) {
     console.log(`ok   ${path}`);
     continue;
