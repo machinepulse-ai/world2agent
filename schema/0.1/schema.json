@@ -16,7 +16,7 @@
             "description": "Inline attachment. For text mime types `data` is UTF-8; for binary\ntypes `data` is base64-encoded.",
             "properties": {
                 "_meta": {
-                    "$ref": "#/definitions/Record<string,unknown>",
+                    "$ref": "#/definitions/Record%3Cstring%2Cunknown%3E",
                     "description": "Extension point. See {@link W2ASignal._meta}."
                 },
                 "data": {
@@ -57,7 +57,7 @@
             "description": "External reference attachment. Sensors SHOULD prefer `reference` for\nanything larger than a few KiB, or anything already addressable.",
             "properties": {
                 "_meta": {
-                    "$ref": "#/definitions/Record<string,unknown>",
+                    "$ref": "#/definitions/Record%3Cstring%2Cunknown%3E",
                     "description": "Extension point. See {@link W2ASignal._meta}."
                 },
                 "description": {
@@ -92,7 +92,7 @@
             "description": "Describes the real-world event that triggered the signal.",
             "properties": {
                 "_meta": {
-                    "$ref": "#/definitions/Record<string,unknown>",
+                    "$ref": "#/definitions/Record%3Cstring%2Cunknown%3E",
                     "description": "Extension point. See {@link W2ASignal._meta}."
                 },
                 "occurred_at": {
@@ -154,15 +154,15 @@
             "description": "Self-describing original event data from the source platform. Carries\nmachine-readable IDs, numbers, booleans, and other facts the graph\nlayer or agent may want to reason over or audit.",
             "properties": {
                 "_meta": {
-                    "$ref": "#/definitions/Record<string,unknown>",
+                    "$ref": "#/definitions/Record%3Cstring%2Cunknown%3E",
                     "description": "Extension point. See {@link W2ASignal._meta}."
                 },
                 "data": {
-                    "$ref": "#/definitions/Record<string,unknown>",
+                    "$ref": "#/definitions/Record%3Cstring%2Cunknown%3E",
                     "description": "The actual structured data conforming to {@link SourceEvent.schema}."
                 },
                 "schema": {
-                    "$ref": "#/definitions/Record<string,unknown>",
+                    "$ref": "#/definitions/Record%3Cstring%2Cunknown%3E",
                     "description": "JSON Schema draft-07 object describing the shape of\n{@link SourceEvent.data}. Represented as an opaque record here;\nconsumers MAY validate that it parses as a JSON Schema."
                 }
             },
@@ -176,7 +176,7 @@
             "description": "The unified signal envelope. Every sensor emits `W2ASignal` and every\nconsumer accepts `W2ASignal` — no sensor-specific shapes on the wire.\n\nAn agent reading only {@link SignalEvent.summary} must be able to\ndecide whether and how to act. Everything else is for downstream\nenrichment or audit.",
             "properties": {
                 "_meta": {
-                    "$ref": "#/definitions/Record<string,unknown>",
+                    "$ref": "#/definitions/Record%3Cstring%2Cunknown%3E",
                     "description": "Extension point for implementation-specific or experimental fields\n(tracing ids, audit markers, vendor annotations). Consumers MUST\nignore unknown `_meta` keys."
                 },
                 "attachments": {
