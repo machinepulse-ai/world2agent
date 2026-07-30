@@ -10,6 +10,6 @@
   "devDependencies": {
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
-    "typescript-json-schema": "^0.65.1"
+    "typescript-json-schema": "^0.68.0"
   }
 }
