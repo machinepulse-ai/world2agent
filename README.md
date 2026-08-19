@@ -180,7 +180,7 @@ That's it — your sensor is now installable by anyone, anywhere.
 [Website](https://machinepulse.ai/) · [X / Twitter](https://x.com/MachinePulse_AI) · [YouTube](https://youtube.com/@MachinePulse_AI) · [Discord](https://discord.gg/hDjaD8pX)
 
 <!-- Star History — uncomment after launch -->
-<!-- [![Star History Chart](https://api.star-history.com/svg?repos=machinepulse-ai/world2agent&type=Date)](https://star-history.com/#machinepulse-ai/world2agent&Date) -->
+<!-- [![Star History Chart](https://star-history.dera.page/svg?repos=machinepulse-ai/world2agent&type=Date)](https://star-history.dera.page/#machinepulse-ai/world2agent&Date) -->
 
 ## License
 
